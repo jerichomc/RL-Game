@@ -1,5 +1,6 @@
 import React from 'react';
 import SurvivorList from './components/SurvivorList';
+import MissionList from './components/MissionList';
 
 
 function App() {
@@ -43,12 +44,46 @@ function App() {
 
   ];
 
+  const missions = [
+  {
+    id: 1,
+    name: 'Abandoned Pharmacy',
+    type: 'scavenge',
+    difficulty: 2,
+    danger: 2,
+    rewards: ['medicine', 'supplies'],
+    risks: ['injury', 'combat'],
+    possibleEnemies: ['Raider', 'Infected'],
+  },
+  {
+    id: 2,
+    name: 'Collapsed Overpass',
+    type: 'combat',
+    difficulty: 3,
+    danger: 4,
+    rewards: ['scrap', 'ammo'],
+    risks: ['injury'],
+    possibleEnemies: ['Raider'],
+  },
+  {
+    id: 3,
+    name: 'Old Emergency Shelter',
+    type: 'recruit',
+    difficulty: 1,
+    danger: 1,
+    rewards: ['new survivor', 'food'],
+    risks: ['stress'],
+    possibleEnemies: [],
+  },
+];
+
   return (
     <main>
       <h1>Ashbound</h1>
       <p>Manage your survivors and send them into the wasteland...</p>
 
       <SurvivorList survivors={survivors} />
+      <MissionList missions={missions} />
     </main>
   )
 }
