@@ -78,6 +78,7 @@ function App() {
   ];
 
   const [selectedMissionId, setSelectedMissionId] = useState(null);
+  const [selectedTeamIds, setSelectedTeamIds] = useState([]);
 
   function handleSelectMission(missionId) {
     // Handler to update the selected mission ID
@@ -88,16 +89,41 @@ function App() {
     (mission) => mission.id === selectedMissionId,
   ); // Find the selected mission object
 
+  function handleToggleTeamMember(survivorId) {
+    // Handler to toggle survivor selection for the team
+    if (!selectedMissionId) return; // Do nothing if no mission is selected
+
+    setSelectedTeamIds((currentTeam) => {
+      if (currentTeam.includes(survivorId)) {
+        return currentTeam.filter((id) => id !== survivorId); // Remove from team if already selected
+      }
+
+      return [...currentTeam, survivorId]; // Add to team if not already selected
+    });
+  }
+
+  const selectedTeam = survivors.filter((survivor) => {
+    return selectedTeamIds.includes(survivor.id);
+  }); // Get the selected survivor objects for the team
+
+
+
   return (
     <main>
       <h1>Ashbound</h1>
       <p>Manage your survivors and send them into the wasteland...</p>
 
-      <SurvivorList survivors={survivors} />
+      <SurvivorList
+        survivors={survivors}
+        selectedTeamIds={selectedTeamIds}
+        onToggleTeamMember={handleToggleTeamMember}
+        missionSelected={Boolean(selectedMission)} // Pass whether a mission is selected
+      />
       <MissionList
         missions={missions} // Pass the missions data
         selectedMissionId={selectedMissionId} // Pass the selected mission ID
         onSelectMission={handleSelectMission} // Pass the handler
+        
       />
       <section>
         <h2>Selected Mission</h2>
@@ -107,6 +133,23 @@ function App() {
           </p>
         ) : (
           <p>No mission selected.</p>
+        )}
+      </section>
+      <section>
+        <h2>Current Team</h2>
+
+        {!selectedMission ? (
+          <p>Select a mission before choosing a team.</p>
+        ) : selectedTeam.length === 0 ? (
+          <p>No survivors selected.</p>
+        ) : (
+          <div>
+            {selectedTeam.map((survivor) => (
+              <p key={survivor.id}>
+                {survivor.name} ({survivor.role})
+              </p>
+            ))}
+          </div>
         )}
       </section>
     </main>

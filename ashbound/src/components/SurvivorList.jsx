@@ -1,17 +1,29 @@
-
-
-function SurvivorList({ survivors }) {
+function SurvivorList({
+  survivors,
+  selectedTeamIds,
+  onToggleTeamMember,
+  missionSelected,
+}) {
   return (
     <section>
       <h2>Roster</h2>
 
       {survivors.length === 0 ? (
-        <p>No survivors available.</p> // Display message if there are no survivors
+        <p>No survivors available.</p>
       ) : (
         <div>
-          {survivors.map((survivor) => ( // Map over survivors and display their details
-          // Each survivor is displayed in an article element with their name, role, HP, stress, quirks, and mutations
-            <article key={survivor.id}> 
+          {survivors.map((survivor) => (
+            <article
+              key={survivor.id}
+              onClick={() => onToggleTeamMember(survivor.id)}
+              style={{
+                border: selectedTeamIds.includes(survivor.id)
+                  ? '2px solid #2f6fed'
+                  : '1px solid #ccc',
+                cursor: missionSelected ? 'pointer' : 'not-allowed',
+                opacity: missionSelected ? 1 : 0.6,
+              }}
+            >
               <h3>{survivor.name}</h3>
               <p>Role: {survivor.role}</p>
               <p>
