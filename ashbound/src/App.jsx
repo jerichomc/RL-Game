@@ -1,4 +1,3 @@
-
 import SurvivorList from "./components/SurvivorList";
 import MissionList from "./components/MissionList";
 import { useState } from "react";
@@ -79,6 +78,7 @@ function App() {
   const [selectedMissionId, setSelectedMissionId] = useState(null);
   const [selectedTeamIds, setSelectedTeamIds] = useState([]);
   const [activeMission, setActiveMission] = useState(null);
+  const [missionResult, setMissionResult] = useState(null);
 
   function handleSelectMission(missionId) {
     // Handler to update the selected mission ID
@@ -86,31 +86,33 @@ function App() {
   }
 
   const selectedMission = missions.find(
-  (mission) => mission.id === selectedMissionId,
-);
+    (mission) => mission.id === selectedMissionId,
+  );
 
-const selectedTeam = survivors.filter((survivor) => {
-  return selectedTeamIds.includes(survivor.id);
-});
-
-const canStartMission = Boolean(selectedMission) && selectedTeam.length > 0;
-
-function handleStartMission() {
-  if (!selectedMission) {
-    return;
-  }
-
-  if (selectedTeam.length === 0) {
-    return;
-  }
-
-  setActiveMission({
-    mission: selectedMission,
-    team: selectedTeam,
-    status: "in-progress",
+  const selectedTeam = survivors.filter((survivor) => {
+    return selectedTeamIds.includes(survivor.id);
   });
-}
 
+  const canStartMission = Boolean(selectedMission) && selectedTeam.length > 0;
+
+  const canResolveMission =
+    Boolean(activeMission) && activeMission.mission.type !== "combat";
+
+  function handleStartMission() {
+    if (!selectedMission) {
+      return;
+    }
+
+    if (selectedTeam.length === 0) {
+      return;
+    }
+
+    setActiveMission({
+      mission: selectedMission,
+      team: selectedTeam,
+      status: "in-progress",
+    });
+  }
 
   function handleToggleTeamMember(survivorId) {
     // Handler to toggle survivor selection for the team
@@ -124,6 +126,37 @@ function handleStartMission() {
       return [...currentTeam, survivorId]; // Add to team if not already selected
     });
   }
+
+  function handleResolveMission() {
+    if (!activeMission) {
+      // No active mission to resolve
+      return;
+    }
+
+    if (activeMission.mission.type === "combat") {
+      // Combat missions are not implemented yet
+      setMissionResult({
+        success: false,
+        text: "Combat missions are not ready yet.",
+        rewards: [],
+      });
+      return;
+    }
+
+    const rewardText = activeMission.mission.rewards.join(", "); // Create a string of rewards for the result text
+
+    setMissionResult({
+      // Set the mission result with success status, descriptive text, and rewards
+      success: true,
+      text: `${activeMission.team[0].name}'s team completed ${activeMission.mission.name}.`,
+      rewards: activeMission.mission.rewards,
+    });
+
+    setActiveMission(null);
+    setSelectedMissionId(null);
+    setSelectedTeamIds([]);
+  }
+
   return (
     <main>
       <h1>Ashbound</h1>
@@ -196,6 +229,33 @@ function handleStartMission() {
           </div>
         ) : (
           <p>No mission started.</p>
+        )}
+      </section>
+      <section>
+        <h2>Mission Resolution</h2>
+
+        <button onClick={handleResolveMission} disabled={!activeMission}>
+          Resolve Mission
+        </button>
+
+        {activeMission && activeMission.mission.type === "combat" && (
+          <p>Combat missions will be handled in the next step.</p>
+        )}
+
+        {activeMission && activeMission.mission.type !== "combat" && (
+          <p>This mission can be resolved with a simple non-combat outcome.</p>
+        )}
+      </section>
+      <section>
+        <h2>Last Mission Result</h2>
+
+        {missionResult ? (
+          <div>
+            <p>{missionResult.text}</p>
+            <p>Rewards found: {missionResult.rewards.join(", ") || "None"}</p>
+          </div>
+        ) : (
+          <p>No mission resolved yet.</p>
         )}
       </section>
     </main>
